@@ -33,7 +33,7 @@
 
 \begin{abstract}
 We design and evaluate a decoupled vector coprocessor for the
-five-stage RISC-V processor developed in ECE/COS 475 labs. The unit
+five-stage RISC-V processor developed in previous ECE475 labs. The unit
 implements a 32-instruction custom vector ISA with eight
 $32 \times 32$-bit vector registers, a four-entry command queue,
 predicated execution via a mask register, strip-mining via SETVL,
@@ -63,7 +63,7 @@ front-end is free to do other work while it runs.
 
 This term project explores that idea by building a decoupled vector
 coprocessor that attaches to the five-stage in-order RISC-V core we
-built across ECE/COS 475 Labs 1--4. We then build a second variant
+built across previous course labs. We then build a second variant
 that adds operation chaining, which the textbook
 \cite{hp_book} highlights as the technique that makes early
 vector machines such as the Cray-1 \cite{cray1} so effective on
@@ -111,8 +111,8 @@ the one developed in lecture.
 \textbf{GPU-style SIMD.} GPUs \cite{nvidia_fermi} take vector ideas
 further by combining wide SIMD lanes with hardware multithreading and
 divergence handling. Their resource demands (large register files,
-many lanes, scratchpad memory) put them out for this project, but the basic abstraction --- a single instruction
-operating over many data elements --- is the same.
+many lanes, scratchpad memory) put them out for this project, but the basic abstraction of having a single instruction
+operating over many data elements is the same.
 
 \textbf{Decoupled access/execute.} Smith's decoupled access/execute
 architecture \cite{smith_dae} introduced the idea of letting an
