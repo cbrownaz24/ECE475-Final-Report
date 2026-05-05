@@ -14,18 +14,18 @@
 \begin{document}
 
 \title{A Decoupled Vector Coprocessor for RISC-V \\
-{\footnotesize ECE/COS 475 Final Project, Spring 2026}}
+{\Large ECE475: Computer Architecture, Term Project, Spring 2026}}
 
 \author{\IEEEauthorblockN{Max Machado}
 \IEEEauthorblockA{\textit{Department of Electrical and Computer Engineering} \\
 \textit{Princeton University}\\
-Princeton, NJ \\
+\texttt{max.machado@princeton.edu} \\
 }
 \and
 \IEEEauthorblockN{Connor Brown}
 \IEEEauthorblockA{\textit{Department of Electrical and Computer Engineering} \\
 \textit{Princeton University}\\
-Princeton, NJ \\
+\texttt{connorbrown@princeton.edu} \\
 }
 }
 
@@ -257,15 +257,21 @@ the speedup denominator), \textit{riscvlong} (longer pipeline with
 single-cycle multiplier), and \textit{riscvooo} (out-of-order dual-issue
 from Lab 4).
 
-We use six kernels reused from the lab benchmark harness, with the
+We add six kernels to the existing the benchmark harness from previous labs, with the
 inner loops rewritten in our vector ISA where applicable:
 \begin{itemize}
 \item \textbf{vvadd} --- elementwise array add. The simplest sanity
   check; isolates dispatch and load/store overhead.
-\item \textbf{saxpy} --- scales an array by a constant and adds it
-  to another. The textbook's canonical chaining target.
-\item \textbf{daxpy} --- the same access pattern with longer arrays
-  and an N-sweep so we can measure scaling behavior.
+\item \textbf{saxpy} --- short AXPY: \texttt{y = a*x + y} on N=16
+  integers. Named after the BLAS single-precision kernel; we use
+  integers because our ALU is integer-only. Runs the
+  VSMUL$\to$VVADD chainable producer/consumer pair without strip-mining.
+\item \textbf{daxpy} --- same AXPY pattern, longer arrays
+  (N $\in$ \{16, 32, 64, 128, 256\}), so N $>$ VLMAX = 32 forces the
+  SETVL/VFENCE strip-mine loop. The ``D'' is borrowed from the BLAS
+  double-precision kernel name; despite the name we again use 32-bit
+  integers. The N-sweep lets us measure how the vector advantage
+  scales with problem size.
 \item \textbf{linpack} --- Gaussian elimination on a $16 \times 16$
   matrix; mixes strided loads, scalar broadcasts, and accumulating
   updates.
@@ -282,10 +288,13 @@ existing checks from previous labs; this catches any
 miscompiled inner loop or mishandled mask immediately.
 
 We measure cycle count directly from the testbench. Functional
-correctness is verified. For clarity, we note that the VecALU
-operates on 32-bit integers only; the ``S'' and ``D'' in
-saxpy/daxpy refer to the AXPY access pattern, not single or
-double precision (no FP unit was implemented in this project due to time).
+correctness is verified. 
+We borrowed the names ``saxpy'' and ``daxpy'' because the
+access pattern (\texttt{y = a*x + y}) is the canonical AXPY pattern
+the textbook uses to motivate chaining \cite[\S 4.2]{hp_book}. In
+our setup the two kernels differ in array length and whether
+strip-mining is exercised, not in numeric precision: both run on
+32-bit integers, since we did not implement a floating-point unit. The reason we include both tests for distinction is primarily due to how we test strip-mining operations as well as potential extensions into floating point operations.
 
 \section{Results and Analysis}
 \subsection{Speedup over scalar baseline}
